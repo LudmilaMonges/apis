@@ -3,14 +3,333 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Document</title>
+    <title>Simpsons TV</title>
+    <style>
+        body {
+            background: radial-gradient(circle, #fca4c4 40%, #f783ac 100%);
+            border-bottom: 60px solid #24b484;
+            min-height: 95vh;
+            font-family: 'Arial', sans-serif;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            margin: 0;
+            padding: 20px;
+        }
+
+        h1 {
+            color: #fcc404;
+            text-shadow: 4px 4px 0px #000;
+            -webkit-text-stroke: 2px #000;
+            font-size: 2.5rem;
+            margin-bottom: 20px;
+        }
+
+        /* NUEVO CONTENEDOR PRINCIPAL: Pone la tele y el control lado a lado */
+        .main-layout {
+            display: flex;
+            flex-direction: row;
+            align-items: flex-start;
+            justify-content: center;
+            gap: 40px; 
+            width: 100%;
+            max-width: 1400px;
+            padding: 0 20px;
+            box-sizing: border-box;
+        }
+
+        /* Ajustamos el tamaño máximo de la TV para que conviva con el control */
+        .tv-container {
+            flex: 1;
+            max-width: 950px;
+            margin-top: 0;
+        }
+
+        .tv-body {
+            background-color: #7c54bc;
+            border: 6px solid #000;
+            border-radius: 35px;
+            padding: 25px;
+            display: flex;
+            gap: 20px;
+            box-shadow: 12px 12px 0px rgba(0,0,0,0.3);
+        }
+
+        .tv-screen {
+            flex: 1;
+            background-color: #a4dcff;
+            border: 6px solid #000;
+            border-radius: 25px;
+            height: 600px;
+            overflow-y: auto;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            padding: 15px;
+            box-shadow: inset 0 0 20px rgba(0,0,0,0.2);
+        }
+
+        .intro-screen {
+            height: 100%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            text-align: center;
+            font-weight: bold;
+            font-size: 1.5rem;
+            color: #1a5c8c;
+            text-shadow: 1px 1px 0px #fff;
+        }
+
+        .character-card {
+            background: #fff;
+            border: 4px solid #000;
+            border-radius: 15px;
+            margin-bottom: 15px;
+            padding: 15px;
+            text-align: center;
+            width: 80%;
+            box-shadow: 6px 6px 0px #000;
+            animation: aparecer 0.3s ease-out;
+        }
+
+        @keyframes aparecer {
+            from { transform: scale(0.9); opacity: 0; }
+            to { transform: scale(1); opacity: 1; }
+        }
+
+        .character-card p {
+            margin: 5px 0;
+            font-weight: bold;
+            font-size: 1.5rem;
+            text-transform: uppercase;
+        }
+
+        .character-card img {
+            max-height: 350px;
+            object-fit: contain;
+            margin: 10px 0;
+        }
+
+        .tv-controls {
+            width: 70px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 15px;
+            justify-content: center;
+        }
+
+        .dial {
+            width: 45px;
+            height: 45px;
+            background-color: #4c2c8c;
+            border: 4px solid #000;
+            border-radius: 50%;
+        }
+
+        .speaker {
+            display: flex;
+            flex-direction: column;
+            gap: 6px;
+            width: 35px;
+            margin-top: 15px;
+        }
+
+        .speaker span {
+            height: 25px;
+            width: 8px;
+            background-color: #4c2c8c;
+            border: 3px solid #000;
+            border-radius: 5px;
+            margin: 0 auto;
+            display: block;
+        }
+
+        .tv-legs {
+            display: flex;
+            justify-content: space-around;
+            padding: 0 100px;
+        }
+
+        .leg {
+            width: 25px;
+            height: 30px;
+            background-color: #94542c;
+            border: 4px solid #000;
+            border-top: none;
+            border-radius: 0 0 8px 8px;
+        }
+
+        /* CONTROL REMOTO: Movido y con posición fija/sticky */
+        .remote-container {
+            margin-top: 0px;
+            background-color: #4a4a4a;
+            border: 5px solid #000;
+            border-radius: 20px;
+            padding: 15px;
+            width: 260px;
+            box-shadow: 5px 5px 0px rgba(0,0,0,0.3);
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 12px;
+            position: sticky; 
+            top: 20px; 
+            flex-shrink: 0;
+        }
+
+        .remote-brand {
+            color: #aaa;
+            font-size: 0.7rem;
+            font-weight: bold;
+            letter-spacing: 2px;
+        }
+
+        .remote-top {
+            display: flex;
+            justify-content: space-between;
+            width: 100%;
+            padding: 0 10px;
+            gap: 10px;
+        }
+
+        .btn-power {
+            flex: 1;
+            background-color: #ff3333;
+            color: #fff;
+            border: 3px solid #000;
+            padding: 8px 0;
+            font-size: 0.8rem;
+            font-weight: bold;
+            border-radius: 20px;
+            cursor: pointer;
+            box-shadow: 2px 2px 0px #000;
+        }
+
+        .btn-power.off {
+            background-color: #222;
+        }
+
+        .channel-controls {
+            display: flex;
+            gap: 10px;
+            width: 100%;
+        }
+
+        .btn-channel {
+            flex: 1;
+            background-color: #24b484;
+            color: white;
+            border: 3px solid #000;
+            padding: 10px;
+            font-size: 0.9rem;
+            font-weight: bold;
+            border-radius: 8px;
+            cursor: pointer;
+            box-shadow: 3px 3px 0px #000;
+        }
+
+        .remote-grid {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 10px;
+            width: 100%;
+            padding: 5px;
+        }
+
+        .remote-grid button {
+            background-color: #fcc404;
+            border: 3px solid #000;
+            padding: 10px;
+            font-size: 1.1rem;
+            font-weight: bold;
+            border-radius: 8px;
+            cursor: pointer;
+            box-shadow: 3px 3px 0px #000;
+        }
+
+        .remote-grid button:active, 
+        .btn-power:active,
+        .btn-channel:active {
+            transform: translate(1px, 1px);
+            box-shadow: 1px 1px 0px #000;
+        }
+
+        /* Responsivo por si se achica mucho la ventana */
+        @media (max-width: 1000px) {
+            .main-layout {
+                flex-direction: column;
+                align-items: center;
+            }
+            .remote-container {
+                position: static;
+                margin-top: 20px;
+            }
+        }
+    </style>
 </head>
-<body >
-    <h1>AJAX ejemplo</h1>
-    <div id="resultado"></div>
-    <button onclick="xhttpRequest()" >pedir</button>
-    <script src="index.js"></script>
+<body>
 
+    <h1>Simpsons TV :3</h1>
 
+    <div class="main-layout">
+        
+        <div class="tv-container">
+            <div class="tv-body">
+                <div id="resultado" class="tv-screen">
+                    <div class="intro-screen">
+                        <p>TV APAGADA<br>Presiona ON para cargar todos<br>o CH+/CH- para pasar canales</p>
+                    </div>
+                </div>
+
+                <div class="tv-controls">
+                    <div class="dial"></div>
+                    <div class="dial"></div>
+                    <div class="speaker">
+                        <span></span><span></span><span></span><span></span>
+                    </div>
+                </div>
+            </div>
+
+            <div class="tv-legs">
+                <div class="leg"></div>
+                <div class="leg"></div>
+            </div>
+        </div>
+
+        <div class="remote-container">
+            <div class="remote-brand">PANAPHONICS</div>
+            
+            <div class="remote-top">
+                <button class="btn-power" onclick="xhttpRequest(true)">ON</button>
+                <button class="btn-power off" onclick="apagarTV()">OFF</button>
+            </div>
+
+            <div class="channel-controls">
+                <button class="btn-channel" onclick="cambiarCanal(-1)">CH -</button>
+                <button class="btn-channel" onclick="cambiarCanal(1)">CH +</button>
+            </div>
+            
+            <div class="remote-grid">
+                <button onclick="elegirCanalNumerico(1)">1</button>
+                <button onclick="elegirCanalNumerico(2)">2</button>
+                <button onclick="elegirCanalNumerico(3)">3</button>
+                <button onclick="elegirCanalNumerico(4)">4</button>
+                <button onclick="elegirCanalNumerico(5)">5</button>
+                <button onclick="elegirCanalNumerico(6)">6</button>
+                <button onclick="elegirCanalNumerico(7)">7</button>
+                <button onclick="elegirCanalNumerico(8)">8</button>
+                <button onclick="elegirCanalNumerico(9)">9</button>
+                
+                <button class="empty-btn" style="background-color:#777; cursor:default;" disabled></button>
+                <button onclick="elegirCanalNumerico(0)">0</button>
+                <button class="empty-btn" style="background-color:#777; cursor:default;" disabled></button>
+            </div>
+        </div>
+
+    </div>
+
+    <script src="index.js"></script> 
 </body>
 </html>
