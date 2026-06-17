@@ -4,7 +4,9 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Simpsons TV</title>
+   
     <style>
+        /* Fondo general rosa y borde inferior verde */
         body {
             background: radial-gradient(circle, #fca4c4 40%, #f783ac 100%);
             border-bottom: 60px solid #24b484;
@@ -17,6 +19,8 @@
             padding: 20px;
         }
 
+
+        /* Estilo del título principal */
         h1 {
             color: #fcc404;
             text-shadow: 4px 4px 0px #000;
@@ -25,26 +29,27 @@
             margin-bottom: 20px;
         }
 
-        /* NUEVO CONTENEDOR PRINCIPAL: Pone la tele y el control lado a lado */
+
+        /* Contenedor que pone la Tele y el Control lado a lado */
         .main-layout {
             display: flex;
-            flex-direction: row;
-            align-items: flex-start;
             justify-content: center;
-            gap: 40px; 
+            align-items: flex-start;
+            gap: 40px;
             width: 100%;
             max-width: 1400px;
             padding: 0 20px;
             box-sizing: border-box;
         }
 
-        /* Ajustamos el tamaño máximo de la TV para que conviva con el control */
+
+        /* Mueble externo de la televisión (borde negro) */
         .tv-container {
             flex: 1;
             max-width: 950px;
-            margin-top: 0;
         }
-
+       
+        /* Cuerpo color violeta de la televisión */
         .tv-body {
             background-color: #7c54bc;
             border: 6px solid #000;
@@ -54,21 +59,55 @@
             gap: 20px;
             box-shadow: 12px 12px 0px rgba(0,0,0,0.3);
         }
-
-        .tv-screen {
+       
+        /* Caja celeste que simula el vidrio de la pantalla y maneja el scroll */
+        .tv-screen-wrapper {
             flex: 1;
+            height: 600px;
+            max-height: 600px;
+            overflow-y: auto;
             background-color: #a4dcff;
             border: 6px solid #000;
             border-radius: 25px;
-            height: 600px;
-            overflow-y: auto;
+            padding: 15px;
+            box-shadow: inset 0 0 20px rgba(0,0,0,0.2);
+            box-sizing: border-box;
+            display: flex;
+            flex-direction: column;
+            gap: 12px;
+        }
+       
+        /* Input para escribir y buscar los nombres */
+        .search-box {
+            width: 100%;
+            padding: 10px 15px;
+            font-size: 1.1rem;
+            font-weight: bold;
+            border: 4px solid #000;
+            border-radius: 12px;
+            background-color: #fff;
+            box-shadow: 4px 4px 0px #000;
+            outline: none;
+            box-sizing: border-box;
+            position: sticky;
+            top: 0;
+            z-index: 10;
+        }
+       
+        /* Cambia a amarillo cuando hacés click en el buscador */
+        .search-box:focus {
+            background-color: #fcc404;
+        }
+       
+        /* Contenedor interno donde se inyectan las tarjetas */
+        .tv-screen {
+            flex: 1;
             display: flex;
             flex-direction: column;
             align-items: center;
-            padding: 15px;
-            box-shadow: inset 0 0 20px rgba(0,0,0,0.2);
         }
-
+       
+        /* Texto centrado para los mensajes de la TV */
         .intro-screen {
             height: 100%;
             display: flex;
@@ -81,6 +120,8 @@
             text-shadow: 1px 1px 0px #fff;
         }
 
+
+        /* Diseño blanco tipo cómic para cada personaje impreso */
         .character-card {
             background: #fff;
             border: 4px solid #000;
@@ -90,27 +131,26 @@
             text-align: center;
             width: 80%;
             box-shadow: 6px 6px 0px #000;
-            animation: aparecer 0.3s ease-out;
+            flex-shrink: 0;
         }
-
-        @keyframes aparecer {
-            from { transform: scale(0.9); opacity: 0; }
-            to { transform: scale(1); opacity: 1; }
-        }
-
+       
+        /* Texto de los nombres dentro de las tarjetas */
         .character-card p {
             margin: 5px 0;
             font-weight: bold;
             font-size: 1.5rem;
             text-transform: uppercase;
         }
-
+       
+        /* Ajuste de las fotos de los personajes */
         .character-card img {
             max-height: 350px;
             object-fit: contain;
             margin: 10px 0;
         }
 
+
+        /* Panel derecho de la TV que sostiene perillas y parlante */
         .tv-controls {
             width: 70px;
             display: flex;
@@ -119,7 +159,8 @@
             gap: 15px;
             justify-content: center;
         }
-
+       
+        /* Las ruedas circulares físicas */
         .dial {
             width: 45px;
             height: 45px;
@@ -127,7 +168,8 @@
             border: 4px solid #000;
             border-radius: 50%;
         }
-
+       
+        /* Contenedor de las ranuras del parlante */
         .speaker {
             display: flex;
             flex-direction: column;
@@ -135,7 +177,8 @@
             width: 35px;
             margin-top: 15px;
         }
-
+       
+        /* Cada rayita negra del parlante de la TV */
         .speaker span {
             height: 25px;
             width: 8px;
@@ -145,13 +188,15 @@
             margin: 0 auto;
             display: block;
         }
-
+       
+        /* Contenedor inferior para separar las patas */
         .tv-legs {
             display: flex;
             justify-content: space-around;
             padding: 0 100px;
         }
-
+       
+        /* Las patitas abajo del mueble */
         .leg {
             width: 25px;
             height: 30px;
@@ -161,9 +206,9 @@
             border-radius: 0 0 8px 8px;
         }
 
-        /* CONTROL REMOTO: Movido y con posición fija/sticky */
+
+        /* Cuerpo oscuro del control remoto */
         .remote-container {
-            margin-top: 0px;
             background-color: #4a4a4a;
             border: 5px solid #000;
             border-radius: 20px;
@@ -174,18 +219,20 @@
             flex-direction: column;
             align-items: center;
             gap: 12px;
-            position: sticky; 
-            top: 20px; 
+            position: sticky;
+            top: 20px;
             flex-shrink: 0;
         }
-
+       
+        /* Texto de la marca del control */
         .remote-brand {
             color: #aaa;
             font-size: 0.7rem;
             font-weight: bold;
             letter-spacing: 2px;
         }
-
+       
+        /* Fila de arriba (ON/OFF) */
         .remote-top {
             display: flex;
             justify-content: space-between;
@@ -193,7 +240,8 @@
             padding: 0 10px;
             gap: 10px;
         }
-
+       
+        /* Botones de encendido */
         .btn-power {
             flex: 1;
             background-color: #ff3333;
@@ -206,17 +254,18 @@
             cursor: pointer;
             box-shadow: 2px 2px 0px #000;
         }
-
         .btn-power.off {
             background-color: #222;
         }
-
+       
+        /* Fila de botones CH+ / CH- */
         .channel-controls {
             display: flex;
             gap: 10px;
             width: 100%;
         }
-
+       
+        /* Botones verdes para pasar canales */
         .btn-channel {
             flex: 1;
             background-color: #24b484;
@@ -229,7 +278,8 @@
             cursor: pointer;
             box-shadow: 3px 3px 0px #000;
         }
-
+       
+        /* Grilla de 3 columnas para los números */
         .remote-grid {
             display: grid;
             grid-template-columns: repeat(3, 1fr);
@@ -237,7 +287,8 @@
             width: 100%;
             padding: 5px;
         }
-
+       
+        /* Botones amarillos numéricos */
         .remote-grid button {
             background-color: #fcc404;
             border: 3px solid #000;
@@ -248,40 +299,47 @@
             cursor: pointer;
             box-shadow: 3px 3px 0px #000;
         }
-
-        .remote-grid button:active, 
-        .btn-power:active,
-        .btn-channel:active {
+       
+        /* Botones grises vacíos */
+        .remote-grid .empty-btn {
+            background-color: #777;
+            cursor: default;
+        }
+       
+        /* Efecto presionado */
+        .remote-grid button:active, .btn-power:active, .btn-channel:active {
             transform: translate(1px, 1px);
             box-shadow: 1px 1px 0px #000;
         }
 
-        /* Responsivo por si se achica mucho la ventana */
+
         @media (max-width: 1000px) {
-            .main-layout {
-                flex-direction: column;
-                align-items: center;
-            }
-            .remote-container {
-                position: static;
-                margin-top: 20px;
-            }
+            .main-layout { flex-direction: column; align-items: center; }
+            .remote-container { position: static; margin-top: 20px; }
         }
     </style>
 </head>
 <body>
 
-    <h1>Simpsons TV :3</h1>
+
+    <h1>The simpsons :o</h1>
+
 
     <div class="main-layout">
-        
+       
         <div class="tv-container">
             <div class="tv-body">
-                <div id="resultado" class="tv-screen">
-                    <div class="intro-screen">
-                        <p>TV APAGADA<br>Presiona ON para cargar todos<br>o CH+/CH- para pasar canales</p>
+               
+                <div class="tv-screen-wrapper">
+                    <input type="text" id="buscador" class="search-box" placeholder="Buscar personaje..." oninput="buscarPersonaje(this.value)">
+                   
+                    <div id="resultado" class="tv-screen">
+                        <div class="intro-screen">
+                            <p>TV APAGADA<br>Presiona ON para encender :v<br>o CH+/CH- para pasar canales</p>
+                        </div>
                     </div>
                 </div>
+
 
                 <div class="tv-controls">
                     <div class="dial"></div>
@@ -291,45 +349,48 @@
                     </div>
                 </div>
             </div>
-
+           
             <div class="tv-legs">
                 <div class="leg"></div>
                 <div class="leg"></div>
             </div>
         </div>
 
+
         <div class="remote-container">
-            <div class="remote-brand">PANAPHONICS</div>
-            
+            <div class="remote-brand">Control Remoto</div>
+           
             <div class="remote-top">
                 <button class="btn-power" onclick="xhttpRequest(true)">ON</button>
                 <button class="btn-power off" onclick="apagarTV()">OFF</button>
             </div>
-
+           
             <div class="channel-controls">
                 <button class="btn-channel" onclick="cambiarCanal(-1)">CH -</button>
                 <button class="btn-channel" onclick="cambiarCanal(1)">CH +</button>
             </div>
-            
+           
             <div class="remote-grid">
                 <button onclick="elegirCanalNumerico(1)">1</button>
                 <button onclick="elegirCanalNumerico(2)">2</button>
                 <button onclick="elegirCanalNumerico(3)">3</button>
+               
                 <button onclick="elegirCanalNumerico(4)">4</button>
                 <button onclick="elegirCanalNumerico(5)">5</button>
                 <button onclick="elegirCanalNumerico(6)">6</button>
+               
                 <button onclick="elegirCanalNumerico(7)">7</button>
-                <button onclick="elegirCanalNumerico(8)">8</button>
-                <button onclick="elegirCanalNumerico(9)">9</button>
-                
-                <button class="empty-btn" style="background-color:#777; cursor:default;" disabled></button>
+                <button onclick="elegirCanalNumerico(8)">8</button> <button onclick="elegirCanalNumerico(9)">9</button>
+               
+                <button class="empty-btn" disabled></button>
                 <button onclick="elegirCanalNumerico(0)">0</button>
-                <button class="empty-btn" style="background-color:#777; cursor:default;" disabled></button>
+                <button class="empty-btn" disabled></button>
             </div>
         </div>
-
+       
     </div>
 
-    <script src="index.js"></script> 
+
+    <script src="index.js"></script>
 </body>
 </html>
