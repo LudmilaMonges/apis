@@ -26,79 +26,165 @@ const imagenesSeguras = {
     "Waylon Smithers, Jr.": "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcQ38EXz4nAfJrB_ZpGJObqoqHGD5wHBFwBkWQ&s",
     "Gary Chalmers": "https://static.wikia.nocookie.net/lossimpson/images/9/96/225x421px-chalmers.png/revision/latest?cb=20150722142626&path-prefix=es",
 };
-
 const IMAGEN_RESPALDO = "https://upload.wikimedia.org/wikipedia/en/0/02/Homer_Simpson._png.png";
 
-function msgTV(txt) {
-    document.querySelector("#resultado").innerHTML = `<div class='intro-screen'><p>${txt}</p></div>`;
-}
-
 function armarCard(p, canal) {
-    let nom = p.name || "Desconocido";
-    // Corrección aquí: buscamos por nombre exacto en el objeto
-    let img = imagenesSeguras[nom] || p.image || IMAGEN_RESPALDO;
-    let ocu = p.occupation || "Desconocido";
-    let htmlCanal = canal ? `<p style='font-size:0.9rem; color:#7c54bc;'>CANAL ${canal}</p><hr>` : "";
+    let nom = p.name || p.character || "Desconocido";
+    let img = p.image || p.imagenUrl || imagenesSeguras[nom] || IMAGEN_RESPALDO;
+    let ocu = p.occupation || p.trabajo || "Desconocido";
+    
+    let htmlCanal = "";
+    if (canal) {
+        htmlCanal = "<p style='font-size:0.9rem; color:#7c54bc;'>CANAL " + canal + "</p><hr style='border:1px solid #000; margin:8px 0;'>";
+    }
 
-    return `<div class='character-card'>
-                ${htmlCanal}
-                <p><strong>${nom}</strong></p>
-                <p style='font-size:1rem; color:#666;'>TRABAJO: ${ocu}</p>
-                <img src='${img}' alt='${nom}' style='max-width:200px;'>
-            </div>`;
+    return "<div class='character-card'>" +
+                htmlCanal +
+                "<p>" + nom + "</p>" +
+                "<p style='font-size:1rem; color:#666; margin-bottom:10px;'>TRABAJO: " + ocu + "</p>" +
+                "<img src='" + img + "' alt='" + nom + "'>" +
+           "</div>";
 }
+
+function msgTV(txt) {
+    document.querySelector("#resultado").innerHTML = "<div class='intro-screen'><p>" + txt + "</p></div>";
+}
+
+function apagarTV() {
+    msgTV("TV APAGADA<br>Presiona ON para cargar todos<br>o CH+/CH- para pasar canales");
+}
+
 function xhttpRequest(mostrarTodo) {
     msgTV("Sintonizando...");
     let xhr = new XMLHttpRequest();
     xhr.open("GET", API_URL, true);
+    
     xhr.onload = function() {
-        if (xhr.status == 200) {
-            let respuesta = JSON.parse(xhr.responseText);
-            
-            // FUERZA LA CONVERSIÓN A ARRAY:
-            // Si la respuesta es un objeto que tiene una propiedad (ej: 'results'), úsala.
-            // Si es un array directo, úsalo. Si no es nada, devuelve un array vacío.
-            listaPersonajes = Array.isArray(respuesta) ? respuesta : (respuesta.results || Object.values(respuesta));
+        if (xhr.status >= 200 && xhr.status < 300) {
+            try {
+                let data = JSON.parse(xhr.responseText);
+                
+                if (data.results && Array.isArray(data.results)) {
+                    listaPersonajes = data.results;
+                } else if (Array.isArray(data)) {
+                    listaPersonajes = data;
+                } else {
+                    listaPersonajes = [];
+                }
+                
+                console.log("Array de personajes recibidos:", listaPersonajes);
 
-            console.log("Datos recibidos:", listaPersonajes); // Esto te dirá qué hay en la consola
+                if (listaPersonajes.length === 0) {
+                    msgTV("No hay personajes");
+                    return;
+                }
 
-            if (mostrarTodo) {
-                let html = listaPersonajes.map(p => armarCard(p)).join("");
-                document.querySelector("#resultado").innerHTML = html;
+                if (mostrarTodo) {
+                    let htmlFinal = "";
+                    for (let i = 0; i < listaPersonajes.length; i++) {
+                        htmlFinal += armarCard(listaPersonajes[i], null);
+                    }
+                    document.querySelector("#resultado").innerHTML = htmlFinal;
+                }
+            } catch (e) {
+                msgTV("ERROR EN DATOS");
             }
+        } else {
+            msgTV("ERROR DE SEÑAL<br>Status: " + xhr.status);
         }
+    };
+    xhr.onerror = function() {
+        msgTV("SIN CONEXIÓN");
     };
     xhr.send();
 }
 
-function apagarTV() {
-    msgTV("TV APAGADA<br>Presiona ON para encender");
-}
-
 function cambiarCanal(dir) {
-    if (listaPersonajes.length === 0) return;
-    indiceActual = (indiceActual + dir + listaPersonajes.length) % listaPersonajes.length;
+    if (listaPersonajes.length === 0) {
+        xhttpRequest(false);
+        setTimeout(function() {
+            if (listaPersonajes.length > 0) cambiarCanal(dir);
+        }, 500);
+        return;
+    }
+    
+    indiceActual = indiceActual + dir;
+    if (indiceActual >= listaPersonajes.length) indiceActual = 0;
+    if (indiceActual < 0) indiceActual = listaPersonajes.length - 1;
+    
     document.querySelector("#resultado").innerHTML = armarCard(listaPersonajes[indiceActual], indiceActual + 1);
 }
 
 function elegirCanalNumerico(num) {
-    entradaNumerica += num.toString();
-    msgTV("SINTONIZANDO: " + entradaNumerica);
+    if (listaPersonajes.length === 0) {
+        xhttpRequest(false);
+    }
     clearTimeout(temporizadorControl);
-    temporizadorControl = setTimeout(function() {
-        let n = parseInt(entradaNumerica);
-        entradaNumerica = "";
-        if (n > 0 && n <= listaPersonajes.length) {
-            indiceActual = n - 1;
-            document.querySelector("#resultado").innerHTML = armarCard(listaPersonajes[indiceActual], n);
-        } else {
-            msgTV("CANAL NO ENCONTRADO");
+    
+    let intento = entradaNumerica + num.toString();
+    if (intento === "00" || (intento.indexOf("0") === 0 && intento.length > 1) || parseInt(intento) > 20) {
+        if (entradaNumerica !== "" && parseInt(intento) > 20) {
+            activarSinto();
         }
-    }, 1000);
+        return;
+    }
+    
+    entradaNumerica = intento;
+    msgTV("SINTONIZANDO:<br>CANAL " + entradaNumerica);
+    
+    if (entradaNumerica.length === 2) {
+        procesarSinto();
+    } else {
+        activarSinto();
+    }
+}
+
+function activarSinto() {
+    temporizadorControl = setTimeout(procesarSinto, 1000);
+}
+
+function procesarSinto() {
+    let num = parseInt(entradaNumerica);
+    entradaNumerica = "";
+    
+    if (isNaN(num) || num === 0 || num > 20) {
+        msgTV("CANAL INVÁLIDO<br><span style='font-size:1rem;'>Probá del 1 al 20</span>");
+        return;
+    }
+
+    if (listaPersonajes[num - 1]) {
+        indiceActual = num - 1;
+        document.querySelector("#resultado").innerHTML = armarCard(listaPersonajes[indiceActual], num);
+    } else {
+        msgTV("CANAL " + num + "<br>SIN TRANSMISIÓN");
+    }
 }
 
 function buscarPersonaje(txt) {
-    if (txt === "") return;
-    let filtrados = listaPersonajes.filter(p => p.name.toLowerCase().includes(txt.toLowerCase()));
-    document.querySelector("#resultado").innerHTML = filtrados.length > 0 ? filtrados.map(p => armarCard(p)).join("") : "No encontrado";
+    if (listaPersonajes.length === 0) {
+        xhttpRequest(false);
+    }
+    if (txt.trim() === "") {
+        apagarTV();
+        return;
+    }
+
+    let htmlFinal = "";
+    let huboCoincidencia = false;
+
+    for (let i = 0; i < listaPersonajes.length; i++) {
+        let p = listaPersonajes[i];
+        let nombre = p.name || p.character || "";
+        
+        if (nombre.toLowerCase().indexOf(txt.toLowerCase()) !== -1) {
+            htmlFinal += armarCard(p, null);
+            huboCoincidencia = true;
+        }
+    }
+
+    if (huboCoincidencia === false) {
+        msgTV("SIN SEÑAL<br><span style='font-size:1rem;'>No hay coincidencias</span>");
+    } else {
+        document.querySelector("#resultado").innerHTML = htmlFinal;
+    }
 }
